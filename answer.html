@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>答案之書</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #b8ebfc;
+            /* 淺藍色 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: "宋體", serif;
+        }
+
+        .canvas {
+            position: relative;
+            width: 380px;
+            height: 700px;
+            background-color: #b8ebfc;
+        }
+
+        .answer {
+            position: absolute;
+            top: 200px;
+            left: 32px;
+            width: 300px;
+            height: 190px;
+            font-size: 40px;
+            line-height: 65px;
+            color: #9a8bb5;
+            font-weight: bold;
+            font-family: "宋體", serif;
+            visibility: hidden;
+        }
+
+        .explanation {
+            position: absolute;
+            top: 35px;
+            left: 32px;
+            width: calc(100% - 64px);
+            font-size: 18px;
+            line-height: 30px;
+            color: #383842;
+            font-family: "宋體", serif;
+        }
+
+        .button {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 16px;
+            background-color: #dfb592;
+            color: rgb(92, 85, 85);
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="canvas">
+        <div class="answer" id="answer"></div>
+        <div class="explanation" id="explanation">
+            遇到問題、猶豫不決時，試試拿走這個簡單的答案或暗示。
+        </div>
+        <button class="button" onclick="showAnswer()">默念問題、尋找答案</button>
+    </div>
+
+    <script>
+        const answers = [
+            "祝你前途無量", "開心就好了", "目前為止的人生還沒有退縮過",
+            "少年人是不知苦的", "沒有什麼事情是你乾不了的",
+            "不用成為任何人，成為自己就好了", "微光始終不朽 在黑暗中指引與守候",
+            "世上無難事，就怕你硬上", "人和人是不盡相同的嘛",
+            "幸福就是兜兜轉轉 我又走到你面前", "無論哪裡 我們總會到達",
+            "別怕親愛的 也許是累了", "你不論如何要記得努力快樂", "Play Well",
+            "有些東西是一定要堅持的", "勇敢一點，答案自然會浮現。",
+            "把握當下，你就有答案了。", "這件事你心裡早已明白。",
+            "世界不完美，但你可以努力靠近它。", "做出讓你感到平靜的選擇。",
+            "你的直覺比你想像的準確。", "嘗試不同的路，也許會有驚喜。",
+            "別急，答案會在合適的時間到來。", "不用急著決定，時間會告訴你真相。",
+            "問問自己，你真正渴望什麼。", "一切從行動開始。",
+            "你需要的，不是答案，而是勇氣。", "有些問題，答案就是「接受」。",
+            "最簡單的路往往是最正確的。", "溫柔對待自己，也對待他人。",
+            "追求完美有時只會讓你更累。", "不如試著接受不完美的美好。",
+            "將你的問題簡化，答案就會浮現。", "有些事，結果比過程重要。",
+            "耐心點，一切都會有結果。", "永遠相信事情能有好的解決方式。",
+            "退一步，答案可能更清楚。", "自己的選擇是最值得信任的。",
+            "試著相信未知的美好。", "看向大局，不要被細節困住。",
+            "微笑，答案會藏在其中。", "試著問不同的問題，答案或許更清晰。",
+            "這並不是唯一的選擇，還有其他可能性。", "沒有標準答案，只有合適的答案。",
+            "答案不是解決一切的鑰匙，行動才是。", "放下恐懼，你已經知道要怎麼做。",
+            "先完成，再追求完美。", "改變視角，你會發現新答案。",
+            "即使錯了，這也是成長的一部分。", "別讓害怕阻止你探索答案。",
+            "這是成長的一部分，去面對吧。", "與其逃避，不如學會如何擁抱挑戰。",
+            "你永遠有權利說「不」。", "放慢腳步，答案就在前方等你。",
+            "別忘了問自己：這真的值得嗎？", "答案或許比你想像的簡單。",
+            "這是個機會，而非障礙。", "是時候對自己更誠實了。",
+            "你的選擇會帶來意想不到的改變。", "如果有疑慮，那就再等等。",
+            "向值得信任的人尋求建議。", "別讓別人的意見淹沒你的心聲。",
+            "你的答案可能已經在生活中出現了。", "學會拒絕，答案會變得清晰。",
+            "嘗試新事物，你的答案藏在未知中。", "追隨你的熱情，它會指引你。",
+            "別再猶豫，你已經準備好了。", "即使不完美，也去開始吧。",
+            "學會放手，答案自然會浮現。", "你的問題值得更好的答案。",
+            "勇敢提出問題，答案就在路上。", "先處理最簡單的部分，然後再挑戰困難的。",
+            "保持開放，答案可能出乎意料。", "別怕錯誤，它是答案的一部分。"
+        ];
+
+        function showAnswer() {
+            const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
+            const answerElement = document.getElementById("answer");
+            const explanationElement = document.getElementById("explanation");
+
+            answerElement.textContent = randomAnswer;
+            answerElement.style.visibility = "visible";
+            explanationElement.style.visibility = "visible";
+        }
+    </script>
+</body>
+
+</html>
